@@ -1,0 +1,51 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "react-router build",
+    "db:generate": "dotenv -- drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply --local DB",
+    "db:migrate-production": "dotenv -- drizzle-kit migrate",
+    "dev": "react-router dev",
+    "start": "wrangler dev",
+    "typecheck": "react-router typegen && tsc --build --noEmit"
+  },
+  "dependencies": {
+    "@conform-to/react": "^1.2.2",
+    "@conform-to/zod": "^1.2.2",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@react-router/node": "0.0.0-experimental-b98209dd9",
+    "@react-router/serve": "0.0.0-experimental-b98209dd9",
+    "@ryanflorence/async-provider": "0.0.1",
+    "bcrypt-edge": "0.1.0",
+    "class-variance-authority": "0.7.0",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "0.36.3",
+    "isbot": "^5.1.17",
+    "lucide-react": "0.460.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router": "0.0.0-experimental-b98209dd9",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241112.0",
+    "@hiogawa/vite-node-miniflare": "0.1.1",
+    "@react-router/dev": "0.0.0-experimental-b98209dd9",
+    "@types/node": "^20",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "dotenv-cli": "^7.4.3",
+    "drizzle-kit": "0.28.1",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-tsconfig-paths": "^5.1.2",
+    "wrangler": "^3.87.0"
+  }
+}
