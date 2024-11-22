@@ -26,9 +26,6 @@ importers:
       '@react-router/serve':
         specifier: 7.0.0
         version: 7.0.0(react-router@7.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.3)
-      '@ryanflorence/async-provider':
-        specifier: 0.0.1
-        version: 0.0.1
       bcrypt-edge:
         specifier: 0.1.0
         version: 0.1.0
@@ -1142,9 +1139,6 @@ packages:
     resolution: {integrity: sha512-vliZLrDmYKyaUoMzEbMTg2JkerfBjn03KmAw9CykO0Zzkzoyd7o3iZNam/TpyWNjNT+Cz2iO3P9Smv2wgrR+Eg==}
     cpu: [x64]
     os: [win32]
-
-  '@ryanflorence/async-provider@0.0.1':
-    resolution: {integrity: sha512-uiuLivJoHrU6OGBHydZNczL7d++aqU/ZcCzeK5dYGJBnHxaaCygBJ3dAh7Mqp+gCuIlwBg2yuMF1o1GfoSEzqw==}
 
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
@@ -3430,8 +3424,6 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.27.3':
     optional: true
-
-  '@ryanflorence/async-provider@0.0.1': {}
 
   '@types/cookie@0.6.0': {}
 
