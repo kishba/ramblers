@@ -60,7 +60,7 @@ export async function action({ request }: Route.ActionArgs) {
 
     setUserId(user.id);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return submission.reply({
       hideFields: ["password"],
       fieldErrors: {
