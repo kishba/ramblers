@@ -8,6 +8,11 @@ interface Headline {
   url: string;
 }
 
+interface PageLink {
+  url: string;
+  text: string;
+}
+
 // Simple handler that just extracts article headlines
 class HeadlineHandler {
   headlines: Headline[] = [];
@@ -44,6 +49,51 @@ class HeadlineHandler {
       }
     }
   }
+
+  getRecapHeadlines(): Headline[] {
+    return this.headlines.filter((headline) =>
+      headline.url.includes("/recap/")
+    );
+  }
+}
+
+// Simple handler that just extracts article headlines
+class PageLinkHandler {
+  pageLinks: PageLink[] = [];
+  currentUrl: string = "";
+  currentText: string = "";
+
+  element(element: Element) {
+    // We're only interested in the headline links
+    if (
+      element.tagName === "a" &&
+      element.hasAttribute("class") &&
+      element.getAttribute("class")?.includes("page-link")
+    ) {
+      // Store the URL when we find the link
+      this.currentUrl = element.getAttribute("href") || "";
+      this.currentText = element.textContent?.trim() || "";
+    }
+  }
+
+  text(text: Text) {
+    // If we have a URL set, this text is likely the title
+    if (this.currentUrl) {
+      this.currentText = text.text.trim();
+
+      // If we have both title and URL, add to our headlines array
+      if (this.currentText && this.currentUrl) {
+        this.pageLinks.push({
+          text: this.currentText,
+          url: this.currentUrl,
+        });
+
+        // Reset for the next link
+        this.currentText = "";
+        this.currentUrl = "";
+      }
+    }
+  }
 }
 
 export function meta() {
@@ -76,21 +126,40 @@ export async function loader() {
 
     // Create our simplified handler
     const handler = new HeadlineHandler();
+    const pageLinkHandler = new PageLinkHandler();
 
     // Apply the HTML rewriter focused only on headline links
     const transformed = new HTMLRewriter()
       .on("a.article-title", handler)
+      .on("a.page-link", pageLinkHandler)
       .transform(response);
 
     // Process the entire response
     await transformed.text();
 
     console.log(`Found ${handler.headlines.length} headlines`);
+    console.log(`Found ${handler.getRecapHeadlines().length} recap headlines`);
+    console.log(`Found ${pageLinkHandler.pageLinks.length} page links`);
+
+    let maxPage = -Infinity;
+    let maxIndex = -1;
+
+    pageLinkHandler.pageLinks.forEach((item: PageLink, index: number) => {
+      const num = Number(item.text);
+      if (!isNaN(num) && num > maxPage) {
+        maxPage = num;
+        maxIndex = index;
+      }
+    });
+    const numberOfPages = maxPage;
+    console.log(`Found ${numberOfPages} pages`);
 
     // Return just the headlines
     return {
       headlines: handler.headlines,
-      count: handler.headlines.length,
+      recapHeadlines: handler.getRecapHeadlines(),
+      pageLinks: pageLinkHandler.pageLinks,
+      numberOfPages,
       source: "boyneramblers.com",
       fetchedAt: new Date().toISOString(),
     };
@@ -106,13 +175,17 @@ export async function loader() {
 }
 
 export default function Dashboard() {
-  const { headlines } = useLoaderData<typeof loader>();
+  const { headlines, pageLinks, numberOfPages, recapHeadlines } =
+    useLoaderData<typeof loader>();
+  console.log(pageLinks);
 
   return (
     <main className="container px-4 py-16 mx-auto w-full">
       <h1>Boyner Ramblers</h1>
       <div className="my-8">
-        {headlines.map((headline, i) => (
+        {/* found how many numberOfPages? I want a sentence saying how many will need to be fetched! */}
+        <div>{numberOfPages} pages</div>
+        {recapHeadlines.map((headline, i) => (
           <div key={i} className="py-2">
             <a href={headline.url} className="text-blue-500 hover:underline">
               {headline.title}
