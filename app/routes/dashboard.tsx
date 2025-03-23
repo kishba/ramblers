@@ -6,6 +6,7 @@ import { scrapeArticles } from "~/lib/scraper";
 interface Headline {
   title: string;
   url: string;
+  modifiedGmt: string;
 }
 
 interface PageLink {
@@ -18,8 +19,11 @@ class HeadlineHandler {
   headlines: Headline[] = [];
   currentTitle: string = "";
   currentUrl: string = "";
+  currentModifiedGmt: string = "";
 
   element(element: Element) {
+    // console.log("element", element.tagName);
+
     // We're only interested in the headline links
     if (
       element.tagName === "a" &&
@@ -28,6 +32,9 @@ class HeadlineHandler {
     ) {
       // Store the URL when we find the link
       this.currentUrl = element.getAttribute("href") || "";
+    }
+    if (element.tagName === "time") {
+      this.currentModifiedGmt = element.getAttribute("datetime") || "";
     }
   }
 
@@ -41,11 +48,13 @@ class HeadlineHandler {
         this.headlines.push({
           title: this.currentTitle,
           url: this.currentUrl,
+          modifiedGmt: this.currentModifiedGmt,
         });
 
         // Reset for the next headline
         this.currentTitle = "";
         this.currentUrl = "";
+        this.currentModifiedGmt = "";
       }
     }
   }
@@ -130,6 +139,7 @@ export async function loader() {
 
     // Apply the HTML rewriter focused only on headline links
     const transformed = new HTMLRewriter()
+      .on("time.updated", handler)
       .on("a.article-title", handler)
       .on("a.page-link", pageLinkHandler)
       .transform(response);
@@ -177,7 +187,8 @@ export async function loader() {
 export default function Dashboard() {
   const { headlines, pageLinks, numberOfPages, recapHeadlines } =
     useLoaderData<typeof loader>();
-  console.log(pageLinks);
+  // console.log(pageLinks);
+  console.log(recapHeadlines);
 
   return (
     <main className="container px-4 py-16 mx-auto w-full">
@@ -185,13 +196,22 @@ export default function Dashboard() {
       <div className="my-8">
         {/* found how many numberOfPages? I want a sentence saying how many will need to be fetched! */}
         <div>{numberOfPages} pages</div>
-        {recapHeadlines.map((headline, i) => (
-          <div key={i} className="py-2">
-            <a href={headline.url} className="text-blue-500 hover:underline">
-              {headline.title}
-            </a>
-          </div>
-        ))}
+        {recapHeadlines.map((headline, i) => {
+          const date = new Date(headline.modifiedGmt);
+          const formattedDate = date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            timeZone: "America/New_York",
+          });
+
+          return (
+            <div key={i} className="py-2">
+              <a href={headline.url} className="text-blue-500 hover:underline">
+                {formattedDate}: {headline.title}
+              </a>
+            </div>
+          );
+        })}
       </div>
       <Form method="post">
         <Button type="submit">Logout</Button>
